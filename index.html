@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University Clinic Tracker & Verifier</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+
+<!-- ROLE SELECTION PAGE -->
+<div id="roleSelectionPage">
+  <div class="role-selection-container">
+    <div class="auth-logo">
+      <i class="fas fa-user-md"></i>
+    </div>
+    <h1 class="auth-title">Welcome to Clinic Tracker</h1>
+    <p class="auth-subtitle">Please select your role to continue</p>
+    
+    <div class="role-cards">
+      <div class="role-card" data-role="faculty">
+        <div class="role-icon">
+          <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+        <h3>Faculty</h3>
+        <p>Verify student visits and view analytics</p>
+      </div>
+      
+      <div class="role-card" data-role="clinic">
+        <div class="role-icon">
+          <i class="fas fa-user-nurse"></i>
+        </div>
+        <h3>Clinic Staff</h3>
+        <p>Log patient visits and manage records</p>
+      </div>
+      
+      <div class="role-card" data-role="student">
+        <div class="role-icon">
+          <i class="fas fa-user-graduate"></i>
+        </div>
+        <h3>Student</h3>
+        <p>View your clinic visit history</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTHENTICATION PAGE -->
+<div id="authPage" style="display: none;">
+  <div class="auth-container">
+    <button class="back-btn" id="backToRoleSelection">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    
+    <div class="auth-logo">
+      <i class="fas fa-user-md"></i>
+    </div>
+    <h1 class="auth-title" id="authTitle">Sign In as Faculty</h1>
+    <p class="auth-subtitle">Enter your @klh.edu.in credentials</p>
+    
+    <!-- LOGIN FORM -->
+    <form class="auth-form" id="loginForm">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="loginEmail" placeholder="Enter your @klh.edu.in email" required>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="password-container">
+          <input type="password" class="password-input" id="loginPassword" placeholder="Enter your password" required>
+          <button type="button" class="password-toggle" id="passwordToggleBtn">
+            <i class="fas fa-eye" id="passwordToggleIcon"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div id="loginError" class="error-message">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="loginErrorText"></span>
+      </div>
+      
+      <button type="submit" class="login-btn" id="loginBtn">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </button>
+    </form>
+
+    <div class="email-constraint">
+      <i class="fas fa-info-circle"></i>
+      Only @klh.edu.in email addresses are allowed
+    </div>
+  </div>
+</div>
+
+<!-- CLINIC STAFF DASHBOARD -->
+<div id="clinicDashboard" style="display: none;">
+  <header>
+    <div class="header-title">University Clinic System</div>
+    <div class="header-subtitle">Kalinga Institute of Industrial Technology</div>
+  </header>
+  
+  <button class="logout-btn" id="clinicLogoutBtn">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </button>
+  
+  <div class="dashboard-container">
+    <div class="welcome-card">
+      <div class="user-info">
+        <div class="user-avatar" id="clinicUserAvatar">C</div>
+        <div>
+          <h2 id="clinicUserName">Welcome, Clinic Staff!</h2>
+          <p id="clinicUserEmail">staff@klh.edu.in</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- LOG PATIENT VISIT CARD -->
+    <div class="card">
+      <h3 style="color: #748DAE; margin-bottom: 25px;">
+        <i class="fas fa-plus-circle"></i> Log Patient Visit
+      </h3>
+      
+      <!-- QR SCANNER SECTION -->
+      <div class="qr-scanner-section">
+        <button class="scanner-btn" id="startScannerBtn">
+          <i class="fas fa-camera"></i> Scan Student QR Code
+        </button>
+        <div id="qr-reader" style="display: none;"></div>
+        <div id="qr-reader-results"></div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Student Name</label>
+        <input type="text" id="studentName" placeholder="Enter student's full name" readonly>
+        <button type="button" class="edit-btn" id="editNameBtn">
+          <i class="fas fa-edit"></i>
+        </button>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Student ID</label>
+        <input type="text" id="studentId" placeholder="Enter student ID" readonly>
+        <button type="button" class="edit-btn" id="editIdBtn">
+          <i class="fas fa-edit"></i>
+        </button>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Symptoms</label>
+        <input list="symptomsList" id="symptoms" placeholder="Select or type symptoms">
+        <datalist id="symptomsList">
+          <option value="Fever">
+          <option value="Cough">
+          <option value="Headache">
+          <option value="Stomach Ache">
+          <option value="Cold & Flu">
+          <option value="Injury">
+          <option value="Chest Pain">
+          <option value="Dizziness">
+          <option value="Allergic Reaction">
+          <option value="Nausea">
+        </datalist>
+      </div>
+      
+      <button class="primary-btn" id="logVisitBtn">
+        <i class="fas fa-save"></i> Log Entry
+      </button>
+      <button class="secondary-btn" id="markExitBtn">
+        <i class="fas fa-sign-out-alt"></i> Mark Exit
+      </button>
+      
+      <div id="qrcode" class="qr-container"></div>
+    </div>
+    
+    <!-- RECENT VISITS -->
+    <div class="card">
+      <h3 style="color: #748DAE; margin-bottom: 20px;">
+        <i class="fas fa-history"></i> Recent Visits
+      </h3>
+      <div id="recentVisits"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FACULTY DASHBOARD -->
+<div id="facultyDashboard" style="display: none;">
+  <header>
+    <div class="header-title">Faculty Dashboard</div>
+    <div class="header-subtitle">Kalinga Institute of Industrial Technology</div>
+  </header>
+  
+  <button class="logout-btn" id="facultyLogoutBtn">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </button>
+  
+  <div class="dashboard-container">
+    <div class="welcome-card">
+      <div class="user-info">
+        <div class="user-avatar" id="facultyUserAvatar">F</div>
+        <div>
+          <h2 id="facultyUserName">Welcome, Faculty!</h2>
+          <p id="facultyUserEmail">faculty@klh.edu.in</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- VERIFY STUDENT VISIT -->
+    <div class="card">
+      <h3 style="color: #748DAE; margin-bottom: 25px;">
+        <i class="fas fa-search"></i> Verify Student Visit
+      </h3>
+      
+      <div class="form-group">
+        <label class="form-label">Student ID to Verify</label>
+        <input type="text" id="facultyIdInput" placeholder="Enter student ID to search">
+      </div>
+      
+      <button class="primary-btn" id="verifyVisitBtn">
+        <i class="fas fa-search"></i> Search Records
+      </button>
+      
+      <div id="facultyLogs"></div>
+      
+      <div class="chart-container">
+        <canvas id="visitChart"></canvas>
+      </div>
+      
+      <div class="faculty-actions">
+        <button class="secondary-btn" id="printFacultyLogsBtn">
+          <i class="fas fa-print"></i> Print Student Records
+        </button>
+        <button class="secondary-btn" id="exportCSVBtn">
+          <i class="fas fa-download"></i> Download CSV
+        </button>
+        <button class="secondary-btn" id="printAllLogsBtn">
+          <i class="fas fa-print"></i> Print All Records
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT DASHBOARD -->
+<div id="studentDashboard" style="display: none;">
+  <header>
+    <div class="header-title">Student Portal</div>
+    <div class="header-subtitle">Kalinga Institute of Industrial Technology</div>
+  </header>
+  
+  <button class="logout-btn" id="studentLogoutBtn">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </button>
+  
+  <div class="dashboard-container">
+    <div class="welcome-card">
+      <div class="user-info">
+        <div class="user-avatar" id="studentUserAvatar">S</div>
+        <div>
+          <h2 id="studentUserName">Welcome, Student!</h2>
+          <p id="studentUserEmail">student@klh.edu.in</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- MY VISIT HISTORY -->
+    <div class="card">
+      <h3 style="color: #748DAE; margin-bottom: 25px;">
+        <i class="fas fa-history"></i> My Visit History
+      </h3>
+      
+      <div class="form-group">
+        <label class="form-label">Your Student ID</label>
+        <input type="text" id="studentIdInput" placeholder="Enter your student ID">
+      </div>
+      
+      <button class="primary-btn" id="showStudentLogsBtn">
+        <i class="fas fa-search"></i> Show My Visits
+      </button>
+      
+      <div id="studentLogs"></div>
+      
+      <button class="secondary-btn" id="printStudentLogsBtn">
+        <i class="fas fa-print"></i> Print My Records
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Action completed successfully!</div>
+
+<script src="script.js"></script>
+</body>
+</html>
